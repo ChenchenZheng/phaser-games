@@ -5,7 +5,9 @@ var zombie = {
   preload: function() {
     game.load.image('fond', 'assets/fond.png');
     game.load.image('player', 'assets/player.png');
+    game.load.image('mechant', 'assets/mechant.png');
   },
+
   create: function() {
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -16,8 +18,17 @@ var zombie = {
     game.physics.arcade.enable(this.player);
 
     this.cursors = game.input.keyboard.createCursorKeys();
+
+    this.mechants = game.add.group();
+    this.timer = game.time.events.loop(200, this.ajouterUnMechant, this);
+
+    this.score = 0;
+    this.labelScore = game.add.text(20, 20, "0", {font: "30px Arial", fill: "#ffffff"});
   },
+
   update: function() {
+    game.physics.arcade.overlap(this.player, this.mechants, this.restartGame, null, this);
+
     this.player.body.velocity.x = 0;
     this.player.body.velocity.y = 0;
 
@@ -37,8 +48,24 @@ var zombie = {
       this.restartGame();
     }
   },
+
   restartGame: function() {
     game.state.start('zombie');
+  },
+
+  ajouterUnMechant: function() {
+    var position = Math.floor(Math.random() * 550) + 1;
+    var mechant = game.add.sprite(position, -50, 'mechant');
+    game.physics.arcade.enable(mechant);
+    mechant.body.gravity.y = 200;
+
+    this.mechants.add(mechant);
+
+    this.score += 10;
+    this.labelScore.text = this.score;
+
+    mechant.checkWorldBounds = true;
+    mechant.outOfBoundsKill = true;
   }
 };
 
